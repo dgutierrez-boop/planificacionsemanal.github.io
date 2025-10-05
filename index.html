@@ -137,10 +137,10 @@
 
         <!-- SECCIÓN DE CARGA DE DATOS (OCULTA POR DEFECTO) -->
         <section id="data-loader" class="bronze-container hidden mb-8 p-4 md:p-6 rounded-xl shadow-inner w-full mx-auto">
-            <h2 class="text-xl font-bold text-amber-400 mb-3 border-b border-gray-700 pb-2">Herramientas de Carga de Datos (Firebase)</h2>
-            <p class="text-gray-400 mb-3 text-sm">Pega la lista de tareas (JSON) aquí para **SOBRESCRIBIR** la planificación en la nube (Firebase).</p>
+            <h2 class="text-xl font-bold text-amber-400 mb-3 border-b border-gray-700 pb-2">Herramientas de Carga de Datos (Local)</h2>
+            <p class="text-gray-400 mb-3 text-sm">Pega la lista de tareas (JSON) aquí para **SOBRESCRIBIR** la planificación solo en este dispositivo.</p>
             <textarea id="task-input" rows="6" class="w-full p-3 bg-black/70 text-amber-300 rounded-lg border border-gray-700 focus:ring-amber-500 focus:border-amber-500 font-mono text-xs"></textarea>
-            <button id="load-tasks-btn" class="mt-3 w-full px-4 py-2 bg-green-700 text-white font-bold rounded-lg hover:bg-green-600 transition-colors shadow-md">Guardar y Actualizar Tablero (Firebase)</button>
+            <button id="load-tasks-btn" class="mt-3 w-full px-4 py-2 bg-green-700 text-white font-bold rounded-lg hover:bg-green-600 transition-colors shadow-md">Guardar y Actualizar Tablero (Local)</button>
             <div id="load-status" class="mt-3 text-center text-sm font-semibold hidden"></div>
         </section>
 
@@ -176,33 +176,15 @@
     
     <!-- Info del usuario y la conexión a la base de datos -->
     <footer class="text-center text-xs text-gray-600 p-2 fixed bottom-0 w-full bg-black/50">
-        Conectado como ID de Usuario: <span id="user-id-display" class="font-mono text-gray-400">Cargando...</span> | Fuente de datos: Firebase Firestore
+        Fuente de datos: Memoria Local del Navegador
     </footer>
 
-    <script type="module">
-        // Importar las librerías de Firebase (v11.6.1)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, query, updateDoc, writeBatch, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // CONFIGURACIÓN DE FIREBASE (Variables globales proporcionadas por el entorno)
-        let firebaseConfig, appId, initialAuthToken;
-        try {
-            firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        } catch (e) {
-            console.error("Error al parsear la configuración de Firebase:", e);
-        }
-
-        // Inicialización de Firebase
-        let app, db, auth;
-        let tasksCollectionRef;
-        let userId = 'anonimo'; // Valor por defecto
-
+    <script> // Cambiado a script simple, no module
         // CONSTANTES
+        const STORAGE_KEY = 'mantenimiento_tasks';
         const ACCESS_CODE = '2305';
-        const FIRESTORE_PATH = `/artifacts/${appId}/public/data/tasks`;
+        
+        // TAREAS PREDETERMINADAS (LISTA ACTUALIZADA Y NORMALIZADA)
         const DEFAULT_TASKS_DATA = [
             { id: 't1', equipo: 'EQUIPOS', tarea: 'INSPECCION DE BALDES', dia: 'MARTES 07', estado: 'PROGRAMADO' },
             { id: 't2', equipo: 'M208', tarea: 'PM 5 MÁS KOMTRAX', dia: 'LUNES 06', estado: 'PROGRAMADO' },
@@ -211,7 +193,7 @@
             { id: 't5', equipo: 'M448', tarea: 'PM X ENGRASE REALIZADO', dia: 'VIERNES 03', estado: 'FINALIZADO' },
             { id: 't6', equipo: 'M517', tarea: 'PM 3 ENGRASE', dia: 'SABADO 04', estado: 'PROGRAMADO' },
             { id: 't7', equipo: 'M452', tarea: 'PM X ENGRASE', dia: 'VIERNES 03', estado: 'PROGRAMADO' },
-            { id: 't8', equipo: 'M639', tarea: 'VERIFICAR RIPPER BAJA SOLO ATRASADO', dia: 'LUNES 06', estado: 'ATRASADO' },
+            { id: 't8', equipo: 'M639', tarea: 'VERIFICAR RIPPER BAJA SOLO', dia: 'LUNES 06', estado: 'PROGRAMADO' },
             { id: 't9', equipo: 'M207', tarea: 'SOLDADURA EN BALDE REPROGRAMAR', dia: 'MIERCOLES 08', estado: 'REPROGRAMADO' },
             { id: 't10', equipo: 'M207', tarea: 'PM 1 ENGRASE', dia: 'DOMINGO 05', estado: 'PROGRAMADO' },
             { id: 't11', equipo: 'M102', tarea: 'PM3 ENGRASE REALIZADO', dia: 'VIERNES 03', estado: 'FINALIZADO' }, 
@@ -221,6 +203,18 @@
             { id: 't15', equipo: 'M205', tarea: 'CONTROL KOMTRAX SULLAIR', dia: 'LUNES 06', estado: 'PROGRAMADO' },
             { id: 't16', equipo: 'M205', tarea: 'COLOCAR NEUMÁTICOS RETIRADOS DE POS 1 Y 2 DE LA 209 EN LA POS. 3 Y 4 DE LA M205', dia: 'JUEVES 09', estado: 'PROGRAMADO' },
             { equipo: 'ME14', tarea: 'CONTROL KOMTRAX', dia: 'MIERCOLES 08', estado: 'PROGRAMADO' }
+        ];
+
+        // DÍAS ORDENADOS
+        const days = [
+            'Todos', 
+            'VIERNES 03', 
+            'SABADO 04', 
+            'DOMINGO 05', 
+            'LUNES 06', 
+            'MARTES 07', 
+            'MIERCOLES 08', 
+            'JUEVES 09'
         ];
 
         // ELEMENTOS DOM
@@ -236,112 +230,18 @@
         const filterContainer = document.getElementById('filter-container');
         const tasksGrid = document.getElementById('tasks-grid');
         const currentFilterDisplay = document.getElementById('current-filter-display');
-        const userIdDisplay = document.getElementById('user-id-display');
-        // const searchInput = document.getElementById('search-input'); // Removido
-
-
-        // Estado del Tablero
+        
         let tasksData = [];
         let currentFilter = 'TODOS';
-        
-        // DÍAS ORDENADOS
-        const days = [
-            'Todos', 
-            'VIERNES 03', 
-            'SABADO 04', 
-            'DOMINGO 05', 
-            'LUNES 06', 
-            'MARTES 07', 
-            'MIERCOLES 08', 
-            'JUEVES 09'
-        ];
 
-
-        // --- FIREBASE FUNCTIONS ---
-
-        async function initializeFirebase() {
-            if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase config no disponible. Usando datos por defecto.");
-                tasksData = normalizeTasks(DEFAULT_TASKS_DATA);
-                setupFilters();
-                return;
-            }
-            
-            try {
-                // setLogLevel('Debug');
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                
-                // tasksCollectionRef apunta a la colección pública de tareas de la app
-                tasksCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'tasks');
-
-                // Autenticación
-                await new Promise((resolve) => {
-                    onAuthStateChanged(auth, async (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            userIdDisplay.textContent = userId;
-                            resolve();
-                        } else {
-                            // Intentar iniciar sesión con token o anónimamente
-                            if (initialAuthToken) {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                            } else {
-                                await signInAnonymously(auth);
-                            }
-                            // onAuthStateChanged se disparará de nuevo con el usuario, si fue exitoso
-                        }
-                    });
-                });
-
-                // Iniciar la escucha en tiempo real de la base de datos
-                setupRealtimeListener();
-
-            } catch (error) {
-                console.error("Error al inicializar Firebase o autenticar:", error);
-                userIdDisplay.textContent = 'Error de conexión';
-                // Cargar datos por defecto si falla la conexión
-                tasksData = normalizeTasks(DEFAULT_TASKS_DATA);
-                setupFilters();
-            }
-        }
-        
-        function setupRealtimeListener() {
-            const q = query(tasksCollectionRef);
-            
-            onSnapshot(q, (snapshot) => {
-                const fetchedTasks = [];
-                let isDataLoaded = false;
-                
-                snapshot.docs.forEach(doc => {
-                    fetchedTasks.push({ id: doc.id, ...doc.data() });
-                    isDataLoaded = true;
-                });
-
-                if (!isDataLoaded && tasksData.length === 0) {
-                    console.log("No hay tareas en Firestore. Cargando las tareas por defecto...");
-                    // Si la base de datos está vacía, la llenamos con las tareas por defecto (solo si el array local también está vacío)
-                    saveTasksToFirestore(DEFAULT_TASKS_DATA);
-                } else {
-                    tasksData = normalizeTasks(fetchedTasks);
-                    setupFilters(); // Re-renderiza con la nueva data
-                    console.log(`Tareas actualizadas: ${tasksData.length}`);
-                }
-            }, (error) => {
-                console.error("Error en el listener de Firestore:", error);
-                // Si hay error en la escucha, forzamos la carga de data por defecto
-                tasksData = normalizeTasks(DEFAULT_TASKS_DATA);
-                setupFilters();
-            });
-        }
+        // --- LÓGICA DE ALMACENAMIENTO LOCAL (RESTITUIDA) ---
         
         function normalizeTasks(tasks) {
             return tasks.map(task => {
                 const diaUpper = (task.dia || '').toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                // Asegurar que tengan ID y estado
-                const id = task.id || crypto.randomUUID();
                 const estado = (task.estado || 'PROGRAMADO').toUpperCase();
+                // Asegurar ID único para el manejo local (si no lo tiene)
+                const id = task.id || crypto.randomUUID(); 
                 
                 return {
                     ...task,
@@ -354,86 +254,61 @@
             });
         }
         
-        // Guarda un array completo de tareas en Firestore (SOBREESCRIBE la colección)
-        async function saveTasksToFirestore(newTasks) {
-            if (!db) return showStatus('❌ Error: Firebase no inicializado.', false);
-            
+        function loadTasksFromStorage() {
             try {
-                // Obtener todos los documentos actuales para eliminarlos
-                const currentDocs = await getDocs(query(tasksCollectionRef));
-                const batch = writeBatch(db);
-
-                // 1. Eliminar documentos existentes
-                currentDocs.forEach(doc => {
-                    batch.delete(doc.ref);
-                });
-
-                // 2. Añadir los nuevos documentos
-                newTasks.forEach((task, index) => {
-                    // Usar un doc() con un ID predefinido o generar uno si no existe
-                    const docId = task.id || `task_${index}_${crypto.randomUUID()}`;
-                    const taskRef = doc(tasksCollectionRef, docId);
-                    
-                    // Asegurar que el objeto a guardar no tiene el campo 'id' duplicado
-                    const { id, ...dataToSave } = task;
-                    
-                    batch.set(taskRef, dataToSave);
-                });
-
-                await batch.commit();
-                showStatus(`✅ ¡${newTasks.length} tareas actualizadas en la nube!`, true);
-                // El listener onSnapshot se encargará del re-render
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed)) {
+                        tasksData = normalizeTasks(parsed);
+                        taskInput.value = JSON.stringify(tasksData, null, 2);
+                        return;
+                    }
+                }
             } catch (e) {
-                console.error("Error al guardar tareas en Firestore:", e);
-                showStatus('❌ Error al guardar en Firebase: ' + e.message, false);
+                console.warn('Error leyendo localStorage, usando default', e);
             }
-        }
-        
-        // Alterna el estado de una sola tarea
-        async function toggleTaskStatus(taskId) {
-            if (!db) return console.error('Firebase no inicializado para actualizar tarea.');
-            
-            try {
-                const task = tasksData.find(t => t.id === taskId);
-                if (!task) return;
-
-                const newEstado = task.estado === 'FINALIZADO' ? 'PROGRAMADO' : 'FINALIZADO';
-                const taskRef = doc(tasksCollectionRef, taskId);
-                
-                await updateDoc(taskRef, {
-                    estado: newEstado,
-                    fecha_mod: new Date().toISOString(),
-                    user_mod: userId // Opcional: registrar quién lo modificó
-                });
-                // El onSnapshot se encargará del re-renderizado
-            } catch (e) {
-                console.error("Error al alternar estado de tarea:", e);
-                showStatus('❌ Error al actualizar estado: ' + e.message, false);
-            }
+            // Si no hay nada, usar por defecto
+            tasksData = normalizeTasks(DEFAULT_TASKS_DATA);
+            taskInput.value = JSON.stringify(tasksData, null, 2);
         }
 
-
-        // --- DOM MANIPULATION & LOGIC ---
-        
-        // Manejador del botón de carga de JSON
-        loadTasksBtn.addEventListener('click', async () => {
+        function saveTasksToStorage() {
             try {
                 const val = taskInput.value.trim();
                 const parsed = JSON.parse(val);
                 if (!Array.isArray(parsed)) throw new Error('El JSON debe ser un array de objetos.');
                 
-                // Normalizar la data antes de guardar en Firebase
-                const normalizedTasks = normalizeTasks(parsed);
+                // Normalizar y regenerar IDs si es necesario
+                const normalizedTasks = normalizeTasks(parsed); 
 
-                // Guardar en Firebase (Esto disparará el onSnapshot y el re-render)
-                await saveTasksToFirestore(normalizedTasks);
-
+                // Guardar
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedTasks));
+                tasksData = normalizedTasks;
+                showStatus('✅ ¡Datos actualizados y guardados en la memoria de este navegador!', true);
+                setupFilters(); // Reconstruye filtros/renders
             } catch (e) {
                 showStatus('❌ Error: ' + e.message, false);
             }
-        });
+        }
         
-        // Removida: searchInput.addEventListener('input', ...)
+        function toggleTaskStatus(taskId) {
+            const taskIndex = tasksData.findIndex(t => t.id === taskId);
+            if (taskIndex === -1) return;
+
+            const newEstado = tasksData[taskIndex].estado === 'FINALIZADO' ? 'PROGRAMADO' : 'FINALIZADO';
+            
+            // Actualizar en el array local
+            tasksData[taskIndex].estado = newEstado;
+            
+            // Guardar la nueva lista en localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
+            
+            // Re-renderizar
+            filterTasksAndRender();
+        }
+
+        // --- RESTO DE LÓGICA (FILTRADO Y RENDER) ---
 
         function showStatus(msg, ok) {
             loadStatus.textContent = msg;
@@ -442,7 +317,7 @@
             setTimeout(() => { loadStatus.style.display = 'none'; }, 4000);
         }
 
-        // RENDER DE TARJETAS (Modificado para usar 'estado' y ser clickeable)
+        // RENDER DE TARJETAS
         function renderCards(filteredTasks) {
             tasksGrid.innerHTML = '';
             if (!filteredTasks || filteredTasks.length === 0) {
@@ -453,7 +328,6 @@
             }
 
             filteredTasks.forEach(task => {
-                // Colores ajustados a BRONCE
                 const equipoColorClass = 'text-amber-400'; 
                 const tareaColorClass = 'text-gray-300'; 
                 const fechaBgClass = 'bg-gray-800/70'; 
@@ -462,7 +336,6 @@
                 let statusTag = '';
                 let cardClassExtra = '';
                 
-                // Lógica para determinar el estado
                 const estado = (task.estado || 'PROGRAMADO').toUpperCase();
 
                 if (estado === 'FINALIZADO') {
@@ -478,7 +351,7 @@
 
                 const card = document.createElement('div');
                 card.className = `task-card rounded-xl p-5 shadow-lg flex flex-col justify-between${cardClassExtra}`; 
-                card.dataset.taskId = task.id; // Añadir ID de Firebase para clickear
+                card.dataset.taskId = task.id; 
 
                 card.innerHTML = `
                     <div>
@@ -493,7 +366,6 @@
                     </div>
                 `;
                 
-                // Evento click para alternar estado
                 card.addEventListener('click', () => {
                     toggleTaskStatus(task.id);
                 });
@@ -566,7 +438,7 @@
             renderCards(filtered);
         }
 
-        // ESCAPAR HTML simple para evitar inyección al render
+        // ESCAPAR HTML simple
         function escapeHtml(str) {
             return String(str).replace(/[&<>"']/g, function (m) {
                 return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m];
@@ -592,8 +464,8 @@
         function checkPasswordAndOpen() {
             if (passwordInput.value === ACCESS_CODE) {
                 closePasswordModal();
-                // Al abrir la herramienta de carga, cargamos el JSON actual de las tareas para que pueda editarlo
-                taskInput.value = JSON.stringify(tasksData.map(({ id, ...rest }) => ({ ...rest, id })), null, 2);
+                // Al abrir, cargamos el JSON actual
+                loadTasksFromStorage(); 
                 dataLoaderSection.classList.remove('hidden');
             } else {
                 console.error('❌ Contraseña incorrecta.');
@@ -611,10 +483,18 @@
             if (e.key === 'Enter') checkPasswordAndOpen();
             if (e.key === 'Escape') closePasswordModal();
         });
+        
+        loadTasksBtn.addEventListener('click', saveTasksToStorage);
+
 
         // Inicialización
-        initializeFirebase();
+        (function init() {
+            loadTasksFromStorage();
+            setupFilters();
+        })();
 
     </script>
 </body>
 </html>
+
+
