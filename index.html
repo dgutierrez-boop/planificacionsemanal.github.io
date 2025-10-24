@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Tablero de Mantenimiento - Semana 41</title>
+    <title>Tablero de Mantenimiento - Semana 44</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,29 +12,24 @@
         /* Base: Inter font, DEEP BLACK/BRONZE background */
         body { 
             font-family: 'Inter', sans-serif; 
-            /* Fondo negro muy oscuro con un sutil degradado de bronce */
             background-image: radial-gradient(at 0% 0%, rgba(139, 69, 19, 0.2) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(184, 134, 11, 0.2) 0%, transparent 50%);
-            background-color: #000000; /* Negro puro */
+            background-color: #000000;
         }
         
         /* Bronze Container General Style */
         .bronze-container {
-            /* Simula una placa de bronce oscuro */
-            background-color: #2c251f; /* Tono marrón/negro oscuro */
-            /* Borde dorado sutil */
+            background-color: #2c251f;
             border: 1px solid #4a4030;
-            /* Sombra exterior pesada y sutil brillo interior */
             box-shadow: 
-                0 6px 15px rgba(0, 0, 0, 0.7), /* Sombra exterior para profundidad */
-                inset 0 0 10px rgba(255, 215, 0, 0.05); /* Brillo interior sutil */
+                0 6px 15px rgba(0, 0, 0, 0.7),
+                inset 0 0 10px rgba(255, 215, 0, 0.05);
             border-radius: 0.75rem; 
             transition: box-shadow 0.3s ease-in-out;
         }
 
         /* Filter Button Active State */
         .active-filter { 
-            /* Bronce brillante activo */
-            background-color: #FFD700 !important; /* Gold */
+            background-color: #FFD700 !important;
             color: #1a1a1a !important; 
             box-shadow: 0 0 15px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.4); 
         }
@@ -42,35 +37,74 @@
         /* Task Card Styles - PLACAS DE BRONCE */
         .task-card { 
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
-            /* Color base de bronce gastado */
-            background-color: #3b3026; /* Marrón oscuro / bronce mate */
-            border: 1px solid #6b5c47; /* Borde más definido */
-            /* Sombra para simular elevación */
+            background-color: #3b3026;
+            border: 1px solid #6b5c47;
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5), 0 12px 30px rgba(0, 0, 0, 0.7); 
             min-height: 120px; 
             border-radius: 0.75rem;
-            cursor: pointer; /* Indica que es clickeable */
+            cursor: pointer;
+            /* Efecto de iluminación latente para TODAS las tarjetas */
+            animation: card-pulse 4s infinite ease-in-out;
         }
         .task-card:hover { 
             transform: translateY(-5px); 
-            /* Sombra más pronunciada al flotar */
             box-shadow: 0 10px 25px rgba(0,0,0,0.9), 0 0 5px rgba(255,215,0,0.3); 
         } 
         
+        /* Tarjetas finalizadas SIN efecto de pulso */
+        .card-finalizada {
+            animation: none !important;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3) !important;
+            opacity: 0.8;
+            background-color: #2a2a2a !important;
+        }
+        
         /* Critical ATRASADO Card Styles - ÓXIDO/CORROSIÓN */
         .card-atrasado { 
-            /* Fondo de óxido rojo oscuro para alarma */
-            background-color: #4f1d1d !important; /* Rojo/Marrón de óxido */
+            background-color: #4f1d1d !important;
             border-color: #ef4444 !important; 
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.2); 
         }
         .card-atrasado:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.9), 0 0 40px rgba(239, 68, 68, 0.7); }
 
-
+        /* --- ESTILOS DE LATIDO (PULSING) --- */
+        @keyframes overdue-pulse {
+            0% { box-shadow: 0 0 10px rgba(255, 165, 0, 0.4), 0 0 20px rgba(255, 165, 0, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.5); }
+            100% { box-shadow: 0 0 10px rgba(255, 165, 0, 0.4), 0 0 20px rgba(255, 165, 0, 0.2); }
+        }
+        
+        /* Efecto de pulso para TODAS las tarjetas */
+        @keyframes card-pulse {
+            0% { 
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5), 
+                          0 12px 30px rgba(0, 0, 0, 0.7),
+                          0 0 8px rgba(255, 215, 0, 0.15); 
+            }
+            50% { 
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6), 
+                          0 12px 35px rgba(139, 69, 19, 0.5),
+                          0 0 15px rgba(255, 215, 0, 0.25); 
+            }
+            100% { 
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5), 
+                          0 12px 30px rgba(0, 0, 0, 0.7),
+                          0 0 8px rgba(255, 215, 0, 0.15); 
+            }
+        }
+        
+        .card-overdue-pulse {
+            animation: overdue-pulse 2s infinite alternate; 
+        }
+        .card-atrasado.card-overdue-pulse {
+            animation: overdue-pulse 1.5s infinite alternate; 
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.9), 0 0 40px rgba(239, 68, 68, 0.7) !important;
+            background-color: #641e1e !important;
+        }
         /* Week Highlight Animation (Bronze Pulse) */
         @keyframes pulse-bg { 
             0% { background-color: #2c251f; } 
-            50% { background-color: #4b3d29; } /* Tono bronce más claro */
+            50% { background-color: #4b3d29; }
             100% { background-color: #2c251f; } 
         }
         .week-highlight { 
@@ -79,25 +113,26 @@
         .hidden { display: none; }
         
         /* Luminous Tag Styles - Brillo sobre el metal */
-        .finalizado-tag, .atrasado-tag, .reprogramado-tag, .programado-tag {
-            font-size: 1rem; 
+        .finalizado-tag, .atrasado-tag, .reprogramado-tag, .programado-tag, .en-proceso-tag {
+            font-size: 1.125rem;
             font-weight: 700; 
             line-height: 1.5rem; 
             animation: pulse-glow 1.5s infinite alternate;
         }
 
-        /* Specific Tag Colors: Ajustados para resaltar en el tema Bronce */
-        .finalizado-tag { color: #4ade80; text-shadow: 0 0 6px #4ade80, 0 0 12px rgba(74, 222, 128, 0.7); } /* Verde Brillante */
-        .atrasado-tag { color: #ef4444; text-shadow: 0 0 6px #ef4444, 0 0 12px rgba(239, 68, 68, 0.7); } /* Rojo de Emergencia (Crítico por atraso) */
-        .reprogramado-tag { color: #f87171; text-shadow: 0 0 6px #f87171, 0 0 12px rgba(248, 113, 113, 0.7); } /* Rojo Claro/Rosa para Advertencia */
-        .programado-tag { color: #38bdf8; text-shadow: 0 0 6px #38bdf8, 0 0 12px rgba(56, 189, 248, 0.7); } /* Azul Luminoso */
+        /* Specific Tag Colors */
+        .finalizado-tag { color: #4ade80; text-shadow: 0 0 6px #4ade80, 0 0 12px rgba(74, 222, 128, 0.7); }
+        .atrasado-tag { color: #ef4444; text-shadow: 0 0 6px #ef4444, 0 0 12px rgba(239, 68, 68, 0.7); }
+        .reprogramado-tag { color: #f87171; text-shadow: 0 0 6px #f87171, 0 0 12px rgba(248, 113, 113, 0.7); }
+        .programado-tag { color: #38bdf8; text-shadow: 0 0 6px #38bdf8, 0 0 12px rgba(56, 189, 248, 0.7); }
+        .en-proceso-tag { color: #fbbf24; text-shadow: 0 0 6px #fbbf24, 0 0 12px rgba(251, 191, 36, 0.7); }
 
         @keyframes pulse-glow {
             from { opacity: 0.7; }
             to { opacity: 1.0; }
         }
 
-        /* Responsive adjustments for Filter buttons on small screens */
+        /* Responsive adjustments for Filter buttons */
         #filter-container {
             justify-content: center; 
             overflow-x: auto; 
@@ -107,8 +142,7 @@
         .filter-btn {
              flex-shrink: 0; 
              text-align: center; 
-             /* Botones con fondo de bronce ligeramente más claro */
-             background-color: #4b3d29; /* Bronce mate */
+             background-color: #4b3d29;
              transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
@@ -117,36 +151,157 @@
              transform: translateY(-2px);
              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
         }
+
+        /* ESTILOS DEL QR FLOTANTE (ARRIBA A LA IZQUIERDA) */
+        .qr-flotante {
+            position: fixed;
+            top: 20px;  
+            left: 20px;
+            z-index: 100;
+            padding: 10px;
+            /* Fondo semitransparente oscuro para que el QR se lea bien */
+            background-color: rgba(0, 0, 0, 0.8);  
+            border-radius: 12px;
+            border: 2px solid #FFD700; /* Borde dorado */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        }
+
+        /* Estilos para el modal de edición */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #FFD700;
+            font-weight: 500;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid #4a4030;
+            border-radius: 0.375rem;
+            color: #fff;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background-color: #e6c200;
+        }
+        
+        .btn-secondary {
+            background-color: #4a4030;
+            color: #fff;
+            border: 1px solid #6b5c47;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a4d3a;
+        }
+        
+        .btn-danger {
+            background-color: #dc2626;
+            color: #fff;
+            border: none;
+        }
+        
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-edit-week {
+            background-color: #4b3d29;
+            color: #FFD700;
+            border: 1px solid #6b5c47;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-edit-week:hover {
+            background-color: #5a4d3a;
+        }
     </style>
 </head>
 <body class="text-slate-200 antialiased">
+    
+    <!-- CÓDIGO QR FLOTANTE -->
+    <div class="qr-flotante">
+        <p class="text-xs text-amber-400 font-semibold mb-1 text-center">Escanear:</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=https://planificacion.free.nf/" 
+            alt="Código QR para la URL del tablero" 
+            width="130" 
+            height="130"
+            class="rounded-lg border-2 border-white"/>
+    </div>
 
+    <!-- CONTENEDOR PRINCIPAL -->
     <div class="w-full max-w-full px-4 md:px-8 mx-auto">
         <header class="text-center mb-8 pt-4"> 
+            
             <h1 class="text-4xl md:text-5xl font-black uppercase text-amber-500 tracking-wider" style="text-shadow: 2px 2px #1a1a1a;">PLANIFICACIÓN MANTENIMIENTO</h1>
-            <div class="inline-block mt-4 p-2 md:p-3 rounded-xl week-highlight bronze-container border-none">
-                <!-- TÍTULO DE BRONCE -->
-                <p class="text-2xl md:text-3xl font-extrabold text-amber-300">Semana 41 (03 Oct - 10 Oct, 2025)</p>
+            
+            <div class="inline-block mt-4 p-2 md:p-3 rounded-xl week-highlight bronze-container border-none relative">
+                <p class="text-2xl md:text-3xl font-extrabold text-amber-300">
+                    Semana <span id="week-number" contenteditable="true" class="border-b border-amber-300 border-dashed">44</span> 
+                    (<span id="week-dates" contenteditable="true" class="border-b border-amber-300 border-dashed">24 Oct - 31 Oct, 2025</span>)
+                </p>
+                <button id="edit-week-btn" class="btn-edit-week absolute -top-2 -right-2 text-xs" title="Editar semana">
+                    ✏️
+                </button>
             </div>
         </header>
 
-        <!-- BOTÓN FLOTANTE (ENGRANAJE) -->
-        <button id="gear-btn" class="loader-toggle-btn p-3 bronze-container rounded-full shadow-xl hover:bg-slate-600 transition-colors text-2xl fixed top-4 right-4 z-50 text-amber-500" title="Mostrar Herramienta de Carga">
-            ⚙️
-        </button>
-
-        <!-- SECCIÓN DE CARGA DE DATOS (OCULTA POR DEFECTO) -->
-        <section id="data-loader" class="bronze-container hidden mb-8 p-4 md:p-6 rounded-xl shadow-inner w-full mx-auto">
-            <h2 class="text-xl font-bold text-amber-400 mb-3 border-b border-gray-700 pb-2">Herramientas de Carga de Datos (Local)</h2>
-            <p class="text-gray-400 mb-3 text-sm">Pega la lista de tareas (JSON) aquí para **SOBRESCRIBIR** la planificación solo en este dispositivo.</p>
-            <textarea id="task-input" rows="6" class="w-full p-3 bg-black/70 text-amber-300 rounded-lg border border-gray-700 focus:ring-amber-500 focus:border-amber-500 font-mono text-xs"></textarea>
-            <button id="load-tasks-btn" class="mt-3 w-full px-4 py-2 bg-green-700 text-white font-bold rounded-lg hover:bg-green-600 transition-colors shadow-md">Guardar y Actualizar Tablero (Local)</button>
-            <div id="load-status" class="mt-3 text-center text-sm font-semibold hidden"></div>
-        </section>
-
         <!-- SECCIÓN DE CONTROLES Y FILTROS -->
         <section id="controls" class="mb-8">
-            <!-- FILTROS DE DÍA -->
             <div id="filter-container" class="bronze-container flex flex-wrap justify-center gap-2 md:gap-3 p-3 rounded-xl w-full mx-auto"></div>
         </section>
 
@@ -155,15 +310,17 @@
             <div class="mb-6 text-center">
                 <h2 class="text-2xl font-bold text-amber-500 mb-2">Tareas Programadas</h2>
                 <p class="text-gray-400">Selecciona un día para filtrar las tareas. Actualmente mostrando: <span id="current-filter-display" class="font-bold text-amber-300">Todos</span></p>
+                <button id="add-task-btn" class="mt-4 px-4 py-2 bg-amber-600 text-black font-semibold rounded-lg hover:bg-amber-500 transition-colors shadow-md">
+                    + Agregar Nueva Tarea
+                </button>
             </div>
             <!-- Responsive Grid -->
             <div id="tasks-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-8"></div>
         </main>
     </div>
-
+    
     <!-- MODAL DE CONTRASEÑA -->
     <div id="password-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
-        <!-- Estilo bronce para el modal -->
         <div class="bronze-container p-6 rounded-xl shadow-2xl w-full max-w-sm">
             <h2 class="text-xl font-bold text-amber-400 mb-4">🔐 Ingresar Contraseña</h2>
             <input id="password-input" type="password" placeholder="Contraseña" class="w-full p-2 rounded bg-black/70 border border-gray-600 text-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500 mb-4" />
@@ -174,82 +331,329 @@
         </div>
     </div>
     
+    <!-- MODAL DE EDICIÓN DE TAREA -->
+    <div id="task-modal" class="modal-overlay hidden">
+        <div class="bronze-container modal-content p-6 rounded-xl shadow-2xl">
+            <h2 id="modal-title" class="text-xl font-bold text-amber-400 mb-4">Nueva Tarea</h2>
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+                
+                <div class="form-group">
+                    <label for="task-equipo" class="form-label">Equipo</label>
+                    <input type="text" id="task-equipo" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="task-tarea" class="form-label">Tarea</label>
+                    <textarea id="task-tarea" class="form-textarea" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="task-dia" class="form-label">Día</label>
+                    <select id="task-dia" class="form-select" required>
+                        <option value="">Seleccionar día</option>
+                        <option value="VIERNES 24">VIERNES 24</option>
+                        <option value="SÁBADO 25">SÁBADO 25</option>
+                        <option value="DOMINGO 26">DOMINGO 26</option>
+                        <option value="LUNES 27">LUNES 27</option>
+                        <option value="MARTES 28">MARTES 28</option>
+                        <option value="MIÉRCOLES 29">MIÉRCOLES 29</option>
+                        <option value="JUEVES 30">JUEVES 30</option>
+                        <option value="VIERNES 31">VIERNES 31</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="task-estado" class="form-label">Estado</label>
+                    <select id="task-estado" class="form-select" required>
+                        <option value="PROGRAMADO">PROGRAMADO</option>
+                        <option value="EN PROCESO">EN PROCESO</option>
+                        <option value="FINALIZADO">FINALIZADO</option>
+                        <option value="ATRASADO">ATRASADO</option>
+                        <option value="REPROGRAMADO">REPROGRAMADO</option>
+                    </select>
+                </div>
+                
+                <div class="flex justify-between mt-4">
+                    <button type="button" id="delete-task-btn" class="btn btn-danger hidden">Eliminar</button>
+                    <div class="flex gap-2">
+                        <button type="button" id="cancel-task-btn" class="btn btn-secondary">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- MODAL DE EDICIÓN DE SEMANA -->
+    <div id="week-modal" class="modal-overlay hidden">
+        <div class="bronze-container modal-content p-6 rounded-xl shadow-2xl">
+            <h2 class="text-xl font-bold text-amber-400 mb-4">📅 Editar Semana</h2>
+            <form id="week-form">
+                <div class="form-group">
+                    <label for="week-number-input" class="form-label">Número de Semana</label>
+                    <input type="number" id="week-number-input" class="form-input" min="1" max="52" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="week-start-date" class="form-label">Fecha de Inicio</label>
+                    <input type="date" id="week-start-date" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="week-end-date" class="form-label">Fecha de Fin</label>
+                    <input type="date" id="week-end-date" class="form-input" required>
+                </div>
+                
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" id="week-cancel" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Semana</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <!-- Info del usuario y la conexión a la base de datos -->
     <footer class="text-center text-xs text-gray-600 p-2 fixed bottom-0 w-full bg-black/50">
         Fuente de datos: Memoria Local del Navegador
     </footer>
 
-    <script> // Cambiado a script simple, no module
+    <script>
         // CONSTANTES
         const STORAGE_KEY = 'mantenimiento_tasks';
+        const WEEK_STORAGE_KEY = 'mantenimiento_week';
         const ACCESS_CODE = '2305';
         
-        // TAREAS PREDETERMINADAS (LISTA ACTUALIZADA Y NORMALIZADA)
+        // TAREAS PREDETERMINADAS (Semana 44)
         const DEFAULT_TASKS_DATA = [
-            { id: 't1', equipo: 'EQUIPOS', tarea: 'INSPECCION DE BALDES', dia: 'MARTES 07', estado: 'PROGRAMADO' },
-            { id: 't2', equipo: 'M208', tarea: 'PM 5 MÁS KOMTRAX', dia: 'LUNES 06', estado: 'PROGRAMADO' },
-            { id: 't3', equipo: 'M205', tarea: 'PM6 + CONTROL DE FUGAS', dia: 'JUEVES 09', estado: 'PROGRAMADO' },
-            { id: 't4', equipo: 'M445', tarea: 'PM X ENGRASE', dia: 'VIERNES 03', estado: 'PROGRAMADO' },
-            { id: 't5', equipo: 'M448', tarea: 'PM X ENGRASE REALIZADO', dia: 'VIERNES 03', estado: 'FINALIZADO' },
-            { id: 't6', equipo: 'M517', tarea: 'PM 3 ENGRASE', dia: 'SABADO 04', estado: 'PROGRAMADO' },
-            { id: 't7', equipo: 'M452', tarea: 'PM X ENGRASE', dia: 'VIERNES 03', estado: 'PROGRAMADO' },
-            { id: 't8', equipo: 'M639', tarea: 'VERIFICAR RIPPER BAJA SOLO', dia: 'LUNES 06', estado: 'PROGRAMADO' },
-            { id: 't9', equipo: 'M207', tarea: 'SOLDADURA EN BALDE REPROGRAMAR', dia: 'MIERCOLES 08', estado: 'REPROGRAMADO' },
-            { id: 't10', equipo: 'M207', tarea: 'PM 1 ENGRASE', dia: 'DOMINGO 05', estado: 'PROGRAMADO' },
-            { id: 't11', equipo: 'M102', tarea: 'PM3 ENGRASE REALIZADO', dia: 'VIERNES 03', estado: 'FINALIZADO' }, 
-            { id: 't12', equipo: 'M209', tarea: 'CONTROL KONTRAX SULLAIR', dia: 'MARTES 07', estado: 'PROGRAMADO' },
-            { id: 't13', equipo: 'M209', tarea: 'ROTAR NEUMÁTICOS DE POS 3Y4 A POS 1Y2 POR MEDIDA DE DESGASTE', dia: 'MIERCOLES 08', estado: 'PROGRAMADO' },
-            { id: 't14', equipo: 'M209', tarea: 'COLOCAR NEUMÁTICOS RETIRADOS DE POS 1Y2 DE LA 206 EN LA POS 3Y4', dia: 'JUEVES 09', estado: 'PROGRAMADO' },
-            { id: 't15', equipo: 'M205', tarea: 'CONTROL KOMTRAX SULLAIR', dia: 'LUNES 06', estado: 'PROGRAMADO' },
-            { id: 't16', equipo: 'M205', tarea: 'COLOCAR NEUMÁTICOS RETIRADOS DE POS 1 Y 2 DE LA 209 EN LA POS. 3 Y 4 DE LA M205', dia: 'JUEVES 09', estado: 'PROGRAMADO' },
-            { equipo: 'ME14', tarea: 'CONTROL KOMTRAX', dia: 'MIERCOLES 08', estado: 'PROGRAMADO' }
+            { "id": "t301", "equipo": "EQUIPOS", "tarea": "REPARACION BALDES", "dia": "SÁBADO 25", "estado": "PROGRAMADO" },
+            { "id": "t302", "equipo": "EQUIPOS", "tarea": "INSPECCION DE BALDES", "dia": "LUNES 27", "estado": "PROGRAMADO" },
+            { "id": "t303", "equipo": "M206", "tarea": "SOLDADURA BALDE", "dia": "SÁBADO 25", "estado": "PROGRAMADO" },
+            { "id": "t304", "equipo": "M206", "tarea": "SUSTITUCION DE CUBIERTAS PO1+P2", "dia": "MARTES 28", "estado": "PROGRAMADO" },
+            { "id": "t305", "equipo": "M207", "tarea": "PM 2 ENGRASE", "dia": "SÁBADO 25", "estado": "PROGRAMADO" },
+            { "id": "t306", "equipo": "M455", "tarea": "PM M ENGRASE", "dia": "LUNES 27", "estado": "PROGRAMADO" },
+            { "id": "t307", "equipo": "M517", "tarea": "DESARME PERNO CENTRAL Y TREN DELANTERO PM3", "dia": "VIERNES 24", "estado": "PROGRAMADO" },
+            { "id": "t308", "equipo": "M517", "tarea": "DESARME PERNO CENTRAL Y TREN DELANTERO PM3", "dia": "SÁBADO 25", "estado": "PROGRAMADO" },
+            { "id": "t309", "equipo": "M517", "tarea": "DESARME PERNO CENTRAL Y TREN DELANTERO PM3", "dia": "LUNES 27", "estado": "PROGRAMADO" },
+            { "id": "t310", "equipo": "M517", "tarea": "DESARME PERNO CENTRAL Y TREN DELANTERO PM3", "dia": "MARTES 28", "estado": "PROGRAMADO" },
+            { "id": "t311", "equipo": "M517", "tarea": "DESARME PERNO CENTRAL Y TREN DELANTERO PM3", "dia": "MIÉRCOLES 29", "estado": "PROGRAMADO" },
+            { "id": "t312", "equipo": "M517", "tarea": "DESARME PERNO CENTRAL Y TREN DELANTERO PM3", "dia": "JUEVES 30", "estado": "PROGRAMADO" },
+            { "id": "t313", "equipo": "M517", "tarea": "DESARME PERNO CENTRAL Y TREN DELANTERO PM3", "dia": "VIERNES 31", "estado": "PROGRAMADO" },
+            { "id": "t314", "equipo": "M101", "tarea": "PM 7 ENGRASE", "dia": "MARTES 28", "estado": "PROGRAMADO" },
+            { "id": "t315", "equipo": "M639", "tarea": "CONTROL DE MANDO RIPPER", "dia": "VIERNES 24", "estado": "PROGRAMADO" },
+            { "id": "t316", "equipo": "M448", "tarea": "PM S ENGRASE", "dia": "VIERNES 24", "estado": "PROGRAMADO" },
+            { "id": "t317", "equipo": "M452", "tarea": "COLOCACION BOMBA HIDRAJLICA VOLCADORA", "dia": "VIERNES 24", "estado": "PROGRAMADO" },
+            { "id": "t318", "equipo": "M309", "tarea": "MODIFICACION DE ROLLOS SUPERIORES", "dia": "LUNES 27", "estado": "PROGRAMADO" },
+            { "id": "t319", "equipo": "M309", "tarea": "MODIFICACION DE ROLLOS SUPERIORES", "dia": "MARTES 28", "estado": "PROGRAMADO" },
+            { "id": "t320", "equipo": "M445", "tarea": "SUSTITUCION DE VIDRIO PUERTA CONDUCTOR", "dia": "MARTES 28", "estado": "PROGRAMADO" },
+            { "id": "t321", "equipo": "M12", "tarea": "PM 250 SULLAIR", "dia": "SÁBADO 25", "estado": "PROGRAMADO" }
         ];
 
-        // DÍAS ORDENADOS
-        const days = [
-            'Todos', 
-            'VIERNES 03', 
-            'SABADO 04', 
-            'DOMINGO 05', 
-            'LUNES 06', 
-            'MARTES 07', 
-            'MIERCOLES 08', 
-            'JUEVES 09'
-        ];
+        // CONFIGURACIÓN INICIAL DE LA SEMANA
+        const DEFAULT_WEEK_CONFIG = {
+            number: 44,
+            startDate: '24 Oct',
+            endDate: '31 Oct',
+            year: 2025,
+            days: ['VIERNES 24', 'SÁBADO 25', 'DOMINGO 26', 'LUNES 27', 'MARTES 28', 'MIÉRCOLES 29', 'JUEVES 30', 'VIERNES 31']
+        };
 
         // ELEMENTOS DOM
-        const gearBtn = document.getElementById('gear-btn');
-        const dataLoaderSection = document.getElementById('data-loader');
         const passwordModal = document.getElementById('password-modal');
         const passwordInput = document.getElementById('password-input');
         const passwordOk = document.getElementById('password-ok');
         const passwordCancel = document.getElementById('password-cancel');
-        const taskInput = document.getElementById('task-input');
-        const loadTasksBtn = document.getElementById('load-tasks-btn');
-        const loadStatus = document.getElementById('load-status');
         const filterContainer = document.getElementById('filter-container');
         const tasksGrid = document.getElementById('tasks-grid');
         const currentFilterDisplay = document.getElementById('current-filter-display');
+        const addTaskBtn = document.getElementById('add-task-btn');
+        const taskModal = document.getElementById('task-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const taskForm = document.getElementById('task-form');
+        const taskIdInput = document.getElementById('task-id');
+        const taskEquipoInput = document.getElementById('task-equipo');
+        const taskTareaInput = document.getElementById('task-tarea');
+        const taskDiaInput = document.getElementById('task-dia');
+        const taskEstadoInput = document.getElementById('task-estado');
+        const deleteTaskBtn = document.getElementById('delete-task-btn');
+        const cancelTaskBtn = document.getElementById('cancel-task-btn');
+        const weekNumberElement = document.getElementById('week-number');
+        const weekDatesElement = document.getElementById('week-dates');
+        const editWeekBtn = document.getElementById('edit-week-btn');
+        const weekModal = document.getElementById('week-modal');
+        const weekForm = document.getElementById('week-form');
+        const weekNumberInput = document.getElementById('week-number-input');
+        const weekStartDateInput = document.getElementById('week-start-date');
+        const weekEndDateInput = document.getElementById('week-end-date');
+        const weekCancel = document.getElementById('week-cancel');
         
         let tasksData = [];
         let currentFilter = 'TODOS';
+        let currentAction = ''; // 'add' o 'edit'
+        let weekConfig = {};
 
-        // --- LÓGICA DE ALMACENAMIENTO LOCAL (RESTITUIDA) ---
+        // --- CONFIGURACIÓN DE LA SEMANA ---
+        
+        function loadWeekConfig() {
+            try {
+                const stored = localStorage.getItem(WEEK_STORAGE_KEY);
+                if (stored) {
+                    weekConfig = JSON.parse(stored);
+                } else {
+                    weekConfig = {...DEFAULT_WEEK_CONFIG};
+                }
+            } catch (e) {
+                console.warn('Error leyendo configuración de semana, usando default', e);
+                weekConfig = {...DEFAULT_WEEK_CONFIG};
+            }
+            
+            updateWeekDisplay();
+        }
+        
+        function saveWeekConfig() {
+            localStorage.setItem(WEEK_STORAGE_KEY, JSON.stringify(weekConfig));
+            updateWeekDisplay();
+            setupFilters();
+        }
+        
+        function updateWeekDisplay() {
+            weekNumberElement.textContent = weekConfig.number;
+            weekDatesElement.textContent = `${weekConfig.startDate} - ${weekConfig.endDate}, ${weekConfig.year}`;
+        }
+        
+        function openWeekModal() {
+            weekNumberInput.value = weekConfig.number;
+            
+            // Establecer fechas por defecto basadas en la configuración actual
+            const today = new Date();
+            const year = weekConfig.year || today.getFullYear();
+            
+            // Intentar parsear las fechas existentes
+            const startDate = parseCustomDate(weekConfig.startDate, year);
+            const endDate = parseCustomDate(weekConfig.endDate, year);
+            
+            weekStartDateInput.value = startDate.toISOString().split('T')[0];
+            weekEndDateInput.value = endDate.toISOString().split('T')[0];
+            
+            weekModal.classList.remove('hidden');
+        }
+        
+        function parseCustomDate(dateStr, year) {
+            // Parsear formato "24 Oct" o similar
+            const parts = dateStr.split(' ');
+            if (parts.length === 2) {
+                const day = parseInt(parts[0]);
+                const month = getMonthNumber(parts[1]);
+                if (day && month !== -1) {
+                    return new Date(year, month, day);
+                }
+            }
+            // Si no se puede parsear, usar fecha actual
+            return new Date();
+        }
+        
+        function getMonthNumber(monthStr) {
+            const months = {
+                'Ene': 0, 'Jan': 0, 'Feb': 1, 'Mar': 2, 'Abr': 3, 'Apr': 3,
+                'May': 4, 'Jun': 5, 'Jul': 6, 'Ago': 7, 'Aug': 7,
+                'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dic': 11, 'Dec': 11
+            };
+            return months[monthStr] !== undefined ? months[monthStr] : -1;
+        }
+        
+        function saveWeekConfigFromForm() {
+            const number = parseInt(weekNumberInput.value);
+            const startDate = new Date(weekStartDateInput.value);
+            const endDate = new Date(weekEndDateInput.value);
+            
+            if (isNaN(number) || number < 1 || number > 52) {
+                alert('El número de semana debe estar entre 1 y 52');
+                return;
+            }
+            
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                alert('Las fechas no son válidas');
+                return;
+            }
+            
+            if (endDate <= startDate) {
+                alert('La fecha de fin debe ser posterior a la fecha de inicio');
+                return;
+            }
+            
+            // Generar días de la semana basados en las fechas seleccionadas
+            const days = generateWeekDays(startDate, endDate);
+            
+            weekConfig = {
+                number: number,
+                startDate: formatDate(startDate),
+                endDate: formatDate(endDate),
+                year: startDate.getFullYear(),
+                days: days
+            };
+            
+            saveWeekConfig();
+            closeWeekModal();
+        }
+        
+        function formatDate(date) {
+            const day = date.getDate();
+            const month = date.toLocaleString('es', { month: 'short' });
+            return `${day} ${month}`;
+        }
+        
+        function generateWeekDays(startDate, endDate) {
+            const days = [];
+            const currentDate = new Date(startDate);
+            const dayNames = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+            
+            while (currentDate <= endDate) {
+                const dayName = dayNames[currentDate.getDay()];
+                const dayNumber = currentDate.getDate();
+                days.push(`${dayName} ${dayNumber}`);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            return days;
+        }
+        
+        function closeWeekModal() {
+            weekModal.classList.add('hidden');
+        }
+
+        // --- LÓGICA DE OVERDUE ---
+
+        function isTaskVisuallyOverdue(task) {
+            // Para simplificar, consideramos vencidas las tareas de días anteriores al actual
+            const taskDay = task.dia;
+            const currentDayIndex = weekConfig.days.indexOf(getCurrentDay());
+            
+            if (currentDayIndex === -1) return false;
+            
+            const taskDayIndex = weekConfig.days.indexOf(taskDay);
+            
+            return taskDayIndex !== -1 && taskDayIndex < currentDayIndex && task.estado !== 'FINALIZADO';
+        }
+        
+        function getCurrentDay() {
+            // Simulamos que hoy es MIÉRCOLES 29
+            return 'MIÉRCOLES 29';
+        }
+
+        // --- LÓGICA DE PERSISTENCIA Y ESTADO ---
         
         function normalizeTasks(tasks) {
             return tasks.map(task => {
-                const diaUpper = (task.dia || '').toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 const estado = (task.estado || 'PROGRAMADO').toUpperCase();
-                // Asegurar ID único para el manejo local (si no lo tiene)
                 const id = task.id || crypto.randomUUID(); 
                 
                 return {
                     ...task,
                     id: id,
-                    equipo: (task.equipo || '').toUpperCase(),
-                    dia: diaUpper,
-                    tarea: (task.tarea || '').toUpperCase(),
-                    estado: estado,
+                    equipo: (task.equipo || '').toUpperCase().trim(),
+                    dia: (task.dia || '').toUpperCase().trim(),
+                    tarea: (task.tarea || '').toUpperCase().trim(),
+                    estado: estado.trim(),
                 }
             });
         }
@@ -261,7 +665,6 @@
                     const parsed = JSON.parse(stored);
                     if (Array.isArray(parsed)) {
                         tasksData = normalizeTasks(parsed);
-                        taskInput.value = JSON.stringify(tasksData, null, 2);
                         return;
                     }
                 }
@@ -270,54 +673,107 @@
             }
             // Si no hay nada, usar por defecto
             tasksData = normalizeTasks(DEFAULT_TASKS_DATA);
-            taskInput.value = JSON.stringify(tasksData, null, 2);
         }
 
         function saveTasksToStorage() {
-            try {
-                const val = taskInput.value.trim();
-                const parsed = JSON.parse(val);
-                if (!Array.isArray(parsed)) throw new Error('El JSON debe ser un array de objetos.');
-                
-                // Normalizar y regenerar IDs si es necesario
-                const normalizedTasks = normalizeTasks(parsed); 
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
+        }
 
-                // Guardar
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedTasks));
-                tasksData = normalizedTasks;
-                showStatus('✅ ¡Datos actualizados y guardados en la memoria de este navegador!', true);
-                setupFilters(); // Reconstruye filtros/renders
-            } catch (e) {
-                showStatus('❌ Error: ' + e.message, false);
+        // --- FUNCIONES DE EDICIÓN DE TAREAS ---
+        
+        function openTaskModal(task = null) {
+            currentAction = task ? 'edit' : 'add';
+            
+            if (task) {
+                // Modo edición
+                modalTitle.textContent = 'Editar Tarea';
+                taskIdInput.value = task.id;
+                taskEquipoInput.value = task.equipo;
+                taskTareaInput.value = task.tarea;
+                taskDiaInput.value = task.dia;
+                taskEstadoInput.value = task.estado;
+                deleteTaskBtn.classList.remove('hidden');
+            } else {
+                // Modo creación
+                modalTitle.textContent = 'Nueva Tarea';
+                taskForm.reset();
+                taskIdInput.value = '';
+                deleteTaskBtn.classList.add('hidden');
             }
+            
+            // Actualizar opciones de días en el select
+            updateDayOptions();
+            
+            taskModal.classList.remove('hidden');
         }
         
-        function toggleTaskStatus(taskId) {
-            const taskIndex = tasksData.findIndex(t => t.id === taskId);
-            if (taskIndex === -1) return;
-
-            const newEstado = tasksData[taskIndex].estado === 'FINALIZADO' ? 'PROGRAMADO' : 'FINALIZADO';
+        function updateDayOptions() {
+            // Limpiar opciones existentes (excepto la primera)
+            while (taskDiaInput.options.length > 1) {
+                taskDiaInput.remove(1);
+            }
             
-            // Actualizar en el array local
-            tasksData[taskIndex].estado = newEstado;
+            // Agregar días de la semana actual
+            weekConfig.days.forEach(day => {
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = day;
+                taskDiaInput.appendChild(option);
+            });
+        }
+        
+        function closeTaskModal() {
+            taskModal.classList.add('hidden');
+        }
+        
+        function saveTask(formData) {
+            const id = taskIdInput.value || crypto.randomUUID();
+            const equipo = taskEquipoInput.value.toUpperCase().trim();
+            const tarea = taskTareaInput.value.toUpperCase().trim();
+            const dia = taskDiaInput.value.toUpperCase().trim();
+            const estado = taskEstadoInput.value.toUpperCase().trim();
             
-            // Guardar la nueva lista en localStorage
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
+            const taskIndex = tasksData.findIndex(t => t.id === id);
             
-            // Re-renderizar
+            if (taskIndex !== -1) {
+                // Actualizar tarea existente
+                tasksData[taskIndex] = {
+                    ...tasksData[taskIndex],
+                    equipo,
+                    tarea,
+                    dia,
+                    estado
+                };
+            } else {
+                // Crear nueva tarea
+                tasksData.push({
+                    id,
+                    equipo,
+                    tarea,
+                    dia,
+                    estado
+                });
+            }
+            
+            saveTasksToStorage();
             filterTasksAndRender();
+            closeTaskModal();
+        }
+        
+        function deleteTask() {
+            const id = taskIdInput.value;
+            if (!id) return;
+            
+            if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
+                tasksData = tasksData.filter(t => t.id !== id);
+                saveTasksToStorage();
+                filterTasksAndRender();
+                closeTaskModal();
+            }
         }
 
-        // --- RESTO DE LÓGICA (FILTRADO Y RENDER) ---
+        // --- RENDERIZADO Y FILTRADO ---
 
-        function showStatus(msg, ok) {
-            loadStatus.textContent = msg;
-            loadStatus.className = ok ? 'mt-3 text-center text-sm font-semibold text-green-400' : 'mt-3 text-center text-sm font-semibold text-red-400';
-            loadStatus.style.display = 'block';
-            setTimeout(() => { loadStatus.style.display = 'none'; }, 4000);
-        }
-
-        // RENDER DE TARJETAS
         function renderCards(filteredTasks) {
             tasksGrid.innerHTML = '';
             if (!filteredTasks || filteredTasks.length === 0) {
@@ -338,13 +794,30 @@
                 
                 const estado = (task.estado || 'PROGRAMADO').toUpperCase();
 
+                // 1. Aplicar clase ATRASADO si el estado es ATRASADO 
+                if (estado === 'ATRASADO') {
+                    cardClassExtra = ' card-atrasado border-red-500'; 
+                }
+
+                // 2. Aplicar clase de PULSACIÓN si la tarea está VENCIDA y NO FINALIZADA
+                if (isTaskVisuallyOverdue(task)) {
+                    cardClassExtra += ' card-overdue-pulse';
+                }
+                
+                // 3. Quitar efecto de pulso SOLO si la tarea está FINALIZADA
+                if (estado === 'FINALIZADO') {
+                    cardClassExtra += ' card-finalizada';
+                }
+
+                // 4. Definir el Tag de Estado
                 if (estado === 'FINALIZADO') {
                     statusTag = `<span class="finalizado-tag">FINALIZADO</span>`;
                 } else if (estado === 'ATRASADO') {
                     statusTag = `<span class="atrasado-tag">¡ATRASADO!</span>`;
-                    cardClassExtra = ' card-atrasado border-red-500';
                 } else if (estado === 'REPROGRAMADO') {
                     statusTag = `<span class="reprogramado-tag">REPROGRAMADO</span>`;
+                } else if (estado === 'EN PROCESO') {
+                    statusTag = `<span class="en-proceso-tag">EN PROCESO</span>`;
                 } else {
                     statusTag = `<span class="programado-tag">PROGRAMADO</span>`;
                 }
@@ -364,10 +837,17 @@
                         </div>
                         <p class="font-medium ${tareaColorClass} mb-4">${escapeHtml(task.tarea || '')}</p>
                     </div>
+                    <div class="flex justify-end">
+                        <button class="edit-task-btn btn btn-sm btn-secondary">Editar</button>
+                    </div>
                 `;
                 
-                card.addEventListener('click', () => {
-                    toggleTaskStatus(task.id);
+                // Evento para editar la tarea
+                const editBtn = card.querySelector('.edit-task-btn');
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Evitar que el clic se propague a la tarjeta
+                    requestPassword('edit');
+                    window.taskToEdit = task; // Guardar la tarea para editar después de la contraseña
                 });
 
                 tasksGrid.appendChild(card);
@@ -376,35 +856,50 @@
 
         // FILTROS
         function setupFilters() {
-            if (filterContainer.children.length === 0) {
-                 // 1. Crear el filtro de DÍAS (Solo se crea una vez)
-                days.forEach((day) => {
-                    const button = document.createElement('button');
-                    const dayShort = day === 'Todos' ? 'Todos' : day.split(' ')[0].substring(0,3);
-                    const dateNum = day === 'Todos' ? '' : (day.split(' ')[1] || '');
-                    
-                    if (day === 'Todos') {
-                        button.innerHTML = `<span class="font-bold">Todos</span>`;
-                    } else {
-                        button.innerHTML = `<span class="font-bold">${dayShort}</span><span class="text-xs">${dateNum}</span>`;
-                    }
+            filterContainer.innerHTML = '';
+            
+            // Crear botón "Todos"
+            const allButton = document.createElement('button');
+            allButton.innerHTML = `<span class="font-bold">Todos</span>`;
+            allButton.className = 'filter-btn flex flex-col items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-lg text-amber-200 font-semibold';
+            allButton.dataset.day = 'TODOS';
+            
+            allButton.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active-filter'));
+                allButton.classList.add('active-filter');
+                currentFilterDisplay.textContent = 'Todos';
+                currentFilter = 'TODOS';
+                filterTasksAndRender();
+            });
+            
+            filterContainer.appendChild(allButton);
 
-                    button.className = 'filter-btn flex flex-col items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-lg text-amber-200 font-semibold';
-                    
-                    const dayForFilter = day.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    button.dataset.day = dayForFilter; 
+            // Crear botones para cada día de la semana
+            weekConfig.days.forEach((day) => {
+                const button = document.createElement('button');
+                // Usar un nombre más corto para el día y la fecha para el botón
+                const dayName = day.split(' ')[0].substring(0,3);
+                const dateNum = day.split(' ')[1] || '';
+                
+                // El código utiliza días sin acento para la lógica, pero los muestra con acento si es posible
+                const dayNameDisplay = dayName.replace('VIE', 'VIE').replace('SÁB', 'SÁB').replace('DOM', 'DOM')
+                    .replace('LUN', 'LUN').replace('MAR', 'MAR').replace('MIÉ', 'MIÉ').replace('JUE', 'JUE');
+                
+                button.innerHTML = `<span class="font-bold">${dayNameDisplay}</span><span class="text-xs">${dateNum}</span>`;
 
-                    button.addEventListener('click', () => {
-                        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active-filter'));
-                        button.classList.add('active-filter');
-                        currentFilterDisplay.textContent = day;
-                        currentFilter = dayForFilter;
-                        filterTasksAndRender();
-                    });
+                button.className = 'filter-btn flex flex-col items-center justify-center h-14 w-14 md:h-16 md:w-16 rounded-lg text-amber-200 font-semibold';
+                button.dataset.day = day;
 
-                    filterContainer.appendChild(button);
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active-filter'));
+                    button.classList.add('active-filter');
+                    currentFilterDisplay.textContent = day;
+                    currentFilter = day;
+                    filterTasksAndRender();
                 });
-            }
+
+                filterContainer.appendChild(button);
+            });
 
             // Aplicar el filtro actual después de cargar la data
             filterTasksAndRender();
@@ -426,14 +921,23 @@
                 filtered = filtered.filter(task => task.dia === currentFilter);
             }
 
-            // 2. Ordenar por índice de día (si el filtro es 'TODOS')
-            if (currentFilter === 'TODOS') {
-                 const normalizedDays = days.map(d => d.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
-                 const allWithIndex = filtered.map(t => ({ ...t, dayIndex: normalizedDays.indexOf(t.dia) }));
-                 allWithIndex.sort((a,b) => (a.dayIndex || 0) - (b.dayIndex || 0));
-                 filtered = allWithIndex;
-            }
+            // 2. Ordenar por fecha (actuales a futuras)
+            const allWithIndex = filtered.map(t => ({ 
+                ...t, 
+                // Usamos el índice del día en la semana o 99 si no existe
+                dayIndex: weekConfig.days.indexOf(t.dia)
+            }));
 
+            allWithIndex.sort((a, b) => {
+                // 1. Ordenar por día (actuales a futuras)
+                if (a.dayIndex !== b.dayIndex) {
+                    return a.dayIndex - b.dayIndex;
+                }
+                // 2. Luego por equipo
+                return a.equipo.localeCompare(b.equipo);
+            });
+            
+            filtered = allWithIndex;
 
             renderCards(filtered);
         }
@@ -445,12 +949,9 @@
             });
         }
 
-        // LÓGICA DEL ENGRAJE / MODAL
-        function toggleModalOrLoader() {
-            if (!dataLoaderSection.classList.contains('hidden')) {
-                dataLoaderSection.classList.add('hidden');
-                return;
-            }
+        // LÓGICA DE CONTRASEÑA
+        function requestPassword(action) {
+            currentAction = action;
             passwordInput.value = '';
             passwordModal.classList.remove('hidden');
             setTimeout(() => passwordInput.focus(), 50);
@@ -464,9 +965,15 @@
         function checkPasswordAndOpen() {
             if (passwordInput.value === ACCESS_CODE) {
                 closePasswordModal();
-                // Al abrir, cargamos el JSON actual
-                loadTasksFromStorage(); 
-                dataLoaderSection.classList.remove('hidden');
+                
+                if (currentAction === 'add') {
+                    openTaskModal();
+                } else if (currentAction === 'edit' && window.taskToEdit) {
+                    openTaskModal(window.taskToEdit);
+                    window.taskToEdit = null;
+                } else if (currentAction === 'edit-week') {
+                    openWeekModal();
+                }
             } else {
                 console.error('❌ Contraseña incorrecta.');
                 passwordInput.value = ''; 
@@ -475,7 +982,6 @@
         }
 
         // EVENTOS
-        gearBtn.addEventListener('click', toggleModalOrLoader);
         passwordOk.addEventListener('click', checkPasswordAndOpen);
         passwordCancel.addEventListener('click', closePasswordModal);
 
@@ -484,11 +990,45 @@
             if (e.key === 'Escape') closePasswordModal();
         });
         
-        loadTasksBtn.addEventListener('click', saveTasksToStorage);
-
+        // Eventos para el modal de tareas
+        addTaskBtn.addEventListener('click', () => requestPassword('add'));
+        cancelTaskBtn.addEventListener('click', closeTaskModal);
+        deleteTaskBtn.addEventListener('click', deleteTask);
+        
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveTask();
+        });
+        
+        // Eventos para el modal de semana
+        editWeekBtn.addEventListener('click', () => {
+            currentAction = 'edit-week';
+            requestPassword('edit-week');
+        });
+        
+        weekForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveWeekConfigFromForm();
+        });
+        
+        weekCancel.addEventListener('click', closeWeekModal);
+        
+        // Cerrar modales al hacer clic fuera del contenido
+        taskModal.addEventListener('click', (e) => {
+            if (e.target === taskModal) {
+                closeTaskModal();
+            }
+        });
+        
+        weekModal.addEventListener('click', (e) => {
+            if (e.target === weekModal) {
+                closeWeekModal();
+            }
+        });
 
         // Inicialización
         (function init() {
+            loadWeekConfig();
             loadTasksFromStorage();
             setupFilters();
         })();
@@ -496,5 +1036,3 @@
     </script>
 </body>
 </html>
-
-
